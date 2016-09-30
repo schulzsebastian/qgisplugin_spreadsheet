@@ -1,7 +1,7 @@
 #/***************************************************************************
 # Spreadsheet
 #
-# Plugin for loading spreadhseet data
+# Plugin for loading spreadsheet data
 #							 -------------------
 #		begin				: 2016-07-03
 #		git sha				: $Format:%H$
