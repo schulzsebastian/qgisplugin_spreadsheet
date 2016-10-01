@@ -27,6 +27,7 @@ import resources
 # Import the code for the dialog
 from spreadsheet_dialog import SpreadsheetDialog
 import os.path
+from utils import read_spreadsheet
 
 
 class Spreadsheet:
@@ -156,12 +157,25 @@ class Spreadsheet:
 
         return action
 
+    def listEPSG(self):
+        codes = []
+        for code in QSettings().value('UI/recentProjectionsAuthId'):
+            codes.append(code[5:])
+        self.dlg.comboBox_3.addItems(codes)
+
+    def updateCoordinates(self):
+        data = read_spreadsheet(self.dlg.lineEdit.text())
+        self.dlg.comboBox.addItems(data[0])
+        self.dlg.comboBox_2.addItems(data[0])
+        self.listEPSG()
+
     def selectFile(self):
         filename = QFileDialog.getOpenFileName(
             None,
             'Open spreadsheet file', '',
             'Spreadsheet file (*.xlsx *.xls *.ods)')
         self.dlg.lineEdit.setText(filename)
+        self.updateCoordinates()
 
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
