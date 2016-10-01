@@ -27,7 +27,7 @@ import resources
 # Import the code for the dialog
 from spreadsheet_dialog import SpreadsheetDialog
 import os.path
-from utils import read_spreadsheet
+from spreadsheet_functions import *
 
 
 class Spreadsheet:
@@ -177,6 +177,14 @@ class Spreadsheet:
         self.dlg.lineEdit.setText(filename)
         self.updateCoordinates()
 
+    def outputOn(self):
+        self.dlg.comboBox_4.setEnabled(True)
+        self.dlg.comboBox_4.addItems(['Shapefile', 'GeoJSON'])
+
+    def outputOff(self):
+        self.dlg.comboBox_4.setEnabled(False)
+        self.dlg.comboBox_4.clear()
+
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
@@ -188,6 +196,8 @@ class Spreadsheet:
             parent=self.iface.mainWindow())
 
         self.dlg.toolButton.clicked.connect(self.selectFile)
+        self.dlg.radioButton.clicked.connect(self.outputOn)
+        self.dlg.radioButton_2.clicked.connect(self.outputOff)
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""

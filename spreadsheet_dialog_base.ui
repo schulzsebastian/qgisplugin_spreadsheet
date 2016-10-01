@@ -49,19 +49,6 @@
      </layout>
     </item>
     <item>
-     <widget class="QCheckBox" name="checkBox">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="text">
-       <string>Skip first row</string>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    <item>
      <widget class="QLabel" name="label_2">
       <property name="text">
        <string>X coordinate:</string>
@@ -99,11 +86,34 @@
      </widget>
     </item>
     <item>
+     <widget class="QCheckBox" name="checkBox">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="text">
+       <string>Skip first row</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="checkBox_2">
+      <property name="text">
+       <string>Convert degree coordinates to decimal</string>
+      </property>
+     </widget>
+    </item>
+    <item>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
        <widget class="QRadioButton" name="radioButton_2">
         <property name="text">
          <string>Memory layer</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -125,16 +135,12 @@
     </item>
     <item>
      <widget class="QComboBox" name="comboBox_4">
-      <item>
-       <property name="text">
-        <string>Shapefile</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>GeoJSON</string>
-       </property>
-      </item>
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="editable">
+       <bool>false</bool>
+      </property>
      </widget>
     </item>
     <item>
