@@ -21,7 +21,7 @@
  ***************************************************************************/
 """
 from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
-from PyQt4.QtGui import QAction, QIcon
+from PyQt4.QtGui import QAction, QIcon, QFileDialog
 # Initialize Qt resources from file resources.py
 import resources
 # Import the code for the dialog
@@ -156,6 +156,13 @@ class Spreadsheet:
 
         return action
 
+    def selectFile(self):
+        filename = QFileDialog.getOpenFileName(
+            None,
+            'Open spreadsheet file', '',
+            'Spreadsheet file (*.xlsx *.xls *.ods)')
+        self.dlg.lineEdit.setText(filename)
+
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
@@ -165,6 +172,8 @@ class Spreadsheet:
             text=self.tr(u'Spreadsheet'),
             callback=self.run,
             parent=self.iface.mainWindow())
+
+        self.dlg.toolButton.clicked.connect(self.selectFile)
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
