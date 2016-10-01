@@ -175,7 +175,8 @@ class Spreadsheet:
             'Open spreadsheet file', '',
             'Spreadsheet file (*.xlsx *.xls *.ods)')
         self.dlg.lineEdit.setText(filename)
-        self.updateCoordinates()
+        if filename:
+            self.updateCoordinates()
 
     def outputOn(self):
         self.dlg.comboBox_4.setEnabled(True)
