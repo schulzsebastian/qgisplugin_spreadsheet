@@ -27,7 +27,7 @@ import resources
 # Import the code for the dialog
 from spreadsheet_dialog import SpreadsheetDialog
 import os.path
-from spreadsheet_functions import *
+from utils import *
 
 
 class Spreadsheet:
