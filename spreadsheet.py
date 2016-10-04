@@ -21,13 +21,13 @@
  ***************************************************************************/
 """
 from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
-from PyQt4.QtGui import QAction, QIcon, QFileDialog
+from PyQt4.QtGui import QAction, QIcon
 # Initialize Qt resources from file resources.py
 import resources
 # Import the code for the dialog
 from spreadsheet_dialog import SpreadsheetDialog
+from spreadsheet_module import SpreadsheetModule
 import os.path
-from utils import *
 
 
 class Spreadsheet:
@@ -61,7 +61,7 @@ class Spreadsheet:
 
         # Create the dialog (after translation) and keep reference
         self.dlg = SpreadsheetDialog()
-
+        self.spreadsheetModule = SpreadsheetModule(self)
         # Declare instance attributes
         self.actions = []
         self.menu = self.tr(u'&Spreadsheet')
@@ -157,35 +157,6 @@ class Spreadsheet:
 
         return action
 
-    def listEPSG(self):
-        codes = []
-        for code in QSettings().value('UI/recentProjectionsAuthId'):
-            codes.append(code[5:])
-        self.dlg.comboBox_3.addItems(codes)
-
-    def updateCoordinates(self):
-        data = read_spreadsheet(self.dlg.lineEdit.text())
-        self.dlg.comboBox.addItems(data[0])
-        self.dlg.comboBox_2.addItems(data[0])
-        self.listEPSG()
-
-    def selectFile(self):
-        filename = QFileDialog.getOpenFileName(
-            None,
-            'Open spreadsheet file', '',
-            'Spreadsheet file (*.xlsx *.xls *.ods)')
-        self.dlg.lineEdit.setText(filename)
-        if filename:
-            self.updateCoordinates()
-
-    def outputOn(self):
-        self.dlg.comboBox_4.setEnabled(True)
-        self.dlg.comboBox_4.addItems(['Shapefile', 'GeoJSON'])
-
-    def outputOff(self):
-        self.dlg.comboBox_4.setEnabled(False)
-        self.dlg.comboBox_4.clear()
-
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
@@ -195,10 +166,6 @@ class Spreadsheet:
             text=self.tr(u'Spreadsheet'),
             callback=self.run,
             parent=self.iface.mainWindow())
-
-        self.dlg.toolButton.clicked.connect(self.selectFile)
-        self.dlg.radioButton.clicked.connect(self.outputOn)
-        self.dlg.radioButton_2.clicked.connect(self.outputOff)
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
