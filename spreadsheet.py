@@ -25,7 +25,6 @@ from PyQt4.QtGui import QAction, QIcon
 # Initialize Qt resources from file resources.py
 import resources
 # Import the code for the dialog
-from spreadsheet_dialog import SpreadsheetDialog
 from spreadsheet_module import SpreadsheetModule
 import os.path
 
@@ -60,7 +59,6 @@ class Spreadsheet:
                 QCoreApplication.installTranslator(self.translator)
 
         # Create the dialog (after translation) and keep reference
-        self.dlg = SpreadsheetDialog()
         self.spreadsheetModule = SpreadsheetModule(self)
         # Declare instance attributes
         self.actions = []
@@ -180,9 +178,9 @@ class Spreadsheet:
     def run(self):
         """Run method that performs all the real work"""
         # show the dialog
-        self.dlg.show()
+        self.spreadsheetModule.show()
         # Run the dialog event loop
-        result = self.dlg.exec_()
+        result = self.spreadsheetModule.exec_()
         # See if OK was pressed
         if result:
             # Do something useful here - delete the line containing pass and

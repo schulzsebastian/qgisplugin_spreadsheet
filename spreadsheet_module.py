@@ -20,21 +20,27 @@
  *                                                                         *
  ***************************************************************************/
 """
+from PyQt4 import uic
 from PyQt4.QtCore import QSettings
-from PyQt4.QtGui import QFileDialog
+from PyQt4.QtGui import QFileDialog, QDialog
 from pyexcel import get_sheet
 import re
+import os
+
+FORM_CLASS, _ = uic.loadUiType(os.path.join(
+    os.path.dirname(__file__), 'spreadsheet_module.ui'))
 
 
-class SpreadsheetModule:
+class SpreadsheetModule(QDialog, FORM_CLASS):
 
-    def __init__(self, parent):
+    def __init__(self, parent, parents=None):
+        super(SpreadsheetModule, self).__init__(parents)
+        self.setupUi(self)
         self.parent = parent
         self.iface = parent.iface
-        self.dlg = parent.dlg
-        self.dlg.toolButton.clicked.connect(self.selectFile)
-        self.dlg.radioButton.clicked.connect(self.outputOn)
-        self.dlg.radioButton_2.clicked.connect(self.outputOff)
+        self.toolButton.clicked.connect(self.selectFile)
+        self.radioButton.clicked.connect(self.outputOn)
+        self.radioButton_2.clicked.connect(self.outputOff)
 
     def read_spreadsheet(self, path):
         try:
@@ -60,12 +66,12 @@ class SpreadsheetModule:
         codes = []
         for code in QSettings().value('UI/recentProjectionsAuthId'):
             codes.append(code[5:])
-        self.dlg.comboBox_3.addItems(codes)
+        self.comboBox_3.addItems(codes)
 
     def updateCoordinates(self):
-        data = self.read_spreadsheet(self.dlg.lineEdit.text())
-        self.dlg.comboBox.addItems(data[0])
-        self.dlg.comboBox_2.addItems(data[0])
+        data = self.read_spreadsheet(self.lineEdit.text())
+        self.comboBox.addItems(data[0])
+        self.comboBox_2.addItems(data[0])
         self.listEPSG()
 
     def selectFile(self):
@@ -73,14 +79,14 @@ class SpreadsheetModule:
             None,
             'Open spreadsheet file', '',
             'Spreadsheet file (*.xlsx *.xls *.ods)')
-        self.dlg.lineEdit.setText(filename)
+        self.lineEdit.setText(filename)
         if filename:
             self.updateCoordinates()
 
     def outputOn(self):
-        self.dlg.comboBox_4.setEnabled(True)
-        self.dlg.comboBox_4.addItems(['Shapefile', 'GeoJSON'])
+        self.comboBox_4.setEnabled(True)
+        self.comboBox_4.addItems(['Shapefile', 'GeoJSON'])
 
     def outputOff(self):
-        self.dlg.comboBox_4.setEnabled(False)
-        self.dlg.comboBox_4.clear()
+        self.comboBox_4.setEnabled(False)
+        self.comboBox_4.clear()
