@@ -162,7 +162,7 @@ class Spreadsheet:
         self.add_action(
             icon_path,
             text=self.tr(u'Spreadsheet'),
-            callback=self.run,
+            callback=self.spreadsheetModule.show,
             parent=self.iface.mainWindow())
 
     def unload(self):
@@ -174,15 +174,3 @@ class Spreadsheet:
             self.iface.removeToolBarIcon(action)
         # remove the toolbar
         del self.toolbar
-
-    def run(self):
-        """Run method that performs all the real work"""
-        # show the dialog
-        self.spreadsheetModule.show()
-        # Run the dialog event loop
-        result = self.spreadsheetModule.exec_()
-        # See if OK was pressed
-        if result:
-            # Do something useful here - delete the line containing pass and
-            # substitute with your code.
-            pass
