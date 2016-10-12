@@ -38,9 +38,9 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
         self.setupUi(self)
         self.parent = parent
         self.iface = parent.iface
-        self.toolButton.clicked.connect(self.selectFile)
-        self.radioButton.clicked.connect(self.outputOn)
-        self.radioButton_2.clicked.connect(self.outputOff)
+        self.fileButton.clicked.connect(self.selectFile)
+        self.memoryButton.clicked.connect(self.outputOn)
+        self.fileSaveButton.clicked.connect(self.outputOff)
 
     def read_spreadsheet(self, path):
         try:
@@ -66,12 +66,12 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
         codes = []
         for code in QSettings().value('UI/recentProjectionsAuthId'):
             codes.append(code[5:])
-        self.comboBox_3.addItems(codes)
+        self.epsgBox.addItems(codes)
 
     def updateCoordinates(self):
-        data = self.read_spreadsheet(self.lineEdit.text())
-        self.comboBox.addItems(data[0])
-        self.comboBox_2.addItems(data[0])
+        data = self.read_spreadsheet(self.fileLine.text())
+        self.xBox.addItems(data[0])
+        self.yBox.addItems(data[0])
         self.listEPSG()
 
     def selectFile(self):
@@ -79,14 +79,14 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
             None,
             'Open spreadsheet file', '',
             'Spreadsheet file (*.xlsx *.xls *.ods)')
-        self.lineEdit.setText(filename)
+        self.fileLine.setText(filename)
         if filename:
             self.updateCoordinates()
 
     def outputOn(self):
-        self.comboBox_4.setEnabled(True)
-        self.comboBox_4.addItems(['Shapefile', 'GeoJSON'])
+        self.outputBox.setEnabled(True)
+        self.outputBox.addItems(['Shapefile', 'GeoJSON'])
 
     def outputOff(self):
-        self.comboBox_4.setEnabled(False)
-        self.comboBox_4.clear()
+        self.outputBox.setEnabled(False)
+        self.outputBox.clear()
