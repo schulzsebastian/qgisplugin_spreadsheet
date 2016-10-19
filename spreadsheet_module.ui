@@ -67,13 +67,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QComboBox" name="epsgBox">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="editable">
-      <bool>true</bool>
-     </property>
+    <widget class="QgsProjectionSelectionWidget" name="epsgBox">
     </widget>
    </item>
    <item>

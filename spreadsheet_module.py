@@ -62,17 +62,10 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
             output.append(line)
         return output
 
-    def listEPSG(self):
-        codes = []
-        for code in QSettings().value('UI/recentProjectionsAuthId'):
-            codes.append(code[5:])
-        self.epsgBox.addItems(codes)
-
     def updateCoordinates(self):
-        data = self.read_spreadsheet(self.fileLine.text())
-        self.xBox.addItems(data[0])
-        self.yBox.addItems(data[0])
-        self.listEPSG()
+        self.spreadsheetData = self.read_spreadsheet(self.fileLine.text())
+        self.xBox.addItems(self.spreadsheetData[0])
+        self.yBox.addItems(self.spreadsheetData[0])
 
     def selectFile(self):
         filename = QFileDialog.getOpenFileName(
@@ -90,3 +83,6 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
     def outputOff(self):
         self.outputBox.setEnabled(False)
         self.outputBox.clear()
+
+    def accept(self):
+        super(SpreadsheetModule, self).accept()
