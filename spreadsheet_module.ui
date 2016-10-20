@@ -67,8 +67,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QgsProjectionSelectionWidget" name="epsgBox">
-    </widget>
+    <widget class="QgsProjectionSelectionWidget" name="epsgBox" native="true"/>
    </item>
    <item>
     <widget class="QCheckBox" name="skipBox">
@@ -93,7 +92,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_4">
      <item>
-      <widget class="QRadioButton" name="fileSaveButton">
+      <widget class="QRadioButton" name="memoryButton">
        <property name="text">
         <string>Memory layer</string>
        </property>
@@ -103,7 +102,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QRadioButton" name="memoryButton">
+      <widget class="QRadioButton" name="fileSaveButton">
        <property name="text">
         <string>Save to file</string>
        </property>
@@ -137,6 +136,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QgsProjectionSelectionWidget</class>
+   <extends>QWidget</extends>
+   <header>qgsprojectionselectionwidget.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>

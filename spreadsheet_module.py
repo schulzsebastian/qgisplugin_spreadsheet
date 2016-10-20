@@ -21,8 +21,9 @@
  ***************************************************************************/
 """
 from PyQt4 import uic
-from PyQt4.QtCore import QSettings
+from PyQt4.QtCore import QSettings, QVariant
 from PyQt4.QtGui import QFileDialog, QDialog, QDialogButtonBox
+from qgis.core import QgsMapLayerRegistry, QgsField, QgsVectorLayer
 from qgis.gui import QgsMessageBar, QgsProjectionSelectionWidget
 from pyexcel import get_sheet
 import re
@@ -40,8 +41,8 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
         self.parent = parent
         self.iface = parent.iface
         self.fileButton.clicked.connect(self.selectFile)
-        self.memoryButton.clicked.connect(self.outputOn)
-        self.fileSaveButton.clicked.connect(self.outputOff)
+        self.memoryButton.clicked.connect(self.outputOff)
+        self.fileSaveButton.clicked.connect(self.outputOn)
         self.executeBox.button(QDialogButtonBox.Ok).setEnabled(False)
         self.epsgBox.setOptionVisible(
             QgsProjectionSelectionWidget.CurrentCrs, False)
@@ -95,4 +96,27 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
         self.outputBox.clear()
 
     def accept(self):
-        super(SpreadsheetModule, self).accept()
+        if self.run():
+            super(SpreadsheetModule, self).accept()
+
+    def run(self):
+        if len(self.spreadsheetData) < 2:
+            self.iface.messageBar().pushMessage(
+                'Spreadsheet',
+                'No data except the header',
+                level=QgsMessageBar.WARNING)
+            return False
+        if self.memoryButton.isChecked():
+            if not QgsMapLayerRegistry.instance().mapLayersByName('Spreadsheet'):
+                vl = QgsVectorLayer(
+                    "Point?crs=" + self.epsgBox.crs().geographicCRSAuthId(),
+                    "Spreadsheet",
+                    "memory")
+                pr = vl.dataProvider()
+                vl.startEditing()
+                pr.addAttributes([QgsField(i, QVariant.String)
+                                  for i in self.spreadsheetData[0]])
+                vl.commitChanges()
+                QgsMapLayerRegistry.instance().addMapLayer(vl)
+            return True
+        return False
