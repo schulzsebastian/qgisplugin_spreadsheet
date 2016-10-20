@@ -129,10 +129,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QDialogButtonBox" name="button_box">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
+    <widget class="QDialogButtonBox" name="executeBox">
      <property name="standardButtons">
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
@@ -143,7 +140,7 @@
  <resources/>
  <connections>
   <connection>
-   <sender>button_box</sender>
+   <sender>executeBox</sender>
    <signal>rejected()</signal>
    <receiver>SpreadsheetDialogBase</receiver>
    <slot>reject()</slot>
@@ -159,7 +156,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>button_box</sender>
+   <sender>executeBox</sender>
    <signal>accepted()</signal>
    <receiver>SpreadsheetDialogBase</receiver>
    <slot>accept()</slot>

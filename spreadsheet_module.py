@@ -22,7 +22,8 @@
 """
 from PyQt4 import uic
 from PyQt4.QtCore import QSettings
-from PyQt4.QtGui import QFileDialog, QDialog
+from PyQt4.QtGui import QFileDialog, QDialog, QDialogButtonBox
+from qgis.gui import QgsMessageBar, QgsProjectionSelectionWidget
 from pyexcel import get_sheet
 import re
 import os
@@ -41,12 +42,12 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
         self.fileButton.clicked.connect(self.selectFile)
         self.memoryButton.clicked.connect(self.outputOn)
         self.fileSaveButton.clicked.connect(self.outputOff)
+        self.executeBox.button(QDialogButtonBox.Ok).setEnabled(False)
+        self.epsgBox.setOptionVisible(
+            QgsProjectionSelectionWidget.CurrentCrs, False)
 
     def read_spreadsheet(self, path):
-        try:
-            return get_sheet(file_name=path).to_array()
-        except:
-            return None
+        return get_sheet(file_name=path).to_array()
 
     def degree_to_decimal(self, coord):
         s = re.search("(\d+)[ENSW](\d+)\'(\d+)\"", coord)
@@ -64,8 +65,17 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
 
     def updateCoordinates(self):
         self.spreadsheetData = self.read_spreadsheet(self.fileLine.text())
-        self.xBox.addItems(self.spreadsheetData[0])
-        self.yBox.addItems(self.spreadsheetData[0])
+        self.xBox.clear()
+        self.yBox.clear()
+        try:
+            self.xBox.addItems(self.spreadsheetData[0])
+            self.yBox.addItems(self.spreadsheetData[0])
+            self.executeBox.button(QDialogButtonBox.Ok).setEnabled(True)
+        except IndexError:
+            self.iface.messageBar().pushMessage(
+                'Spreadsheet',
+                'Empty file',
+                level=QgsMessageBar.WARNING)
 
     def selectFile(self):
         filename = QFileDialog.getOpenFileName(
