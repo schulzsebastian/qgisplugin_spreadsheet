@@ -81,7 +81,8 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
     def selectFile(self):
         filename = QFileDialog.getOpenFileName(
             None,
-            'Open spreadsheet file', '',
+            'Open spreadsheet file',
+            '',
             'Spreadsheet file (*.xlsx *.xls *.ods)')
         self.fileLine.setText(filename)
         if filename:
@@ -95,6 +96,41 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
         self.outputBox.setEnabled(False)
         self.outputBox.clear()
 
+    def createMemoryLayer(self):
+        vl = QgsVectorLayer(
+            "Point?crs=" + self.epsgBox.crs().geographicCRSAuthId(),
+            "Spreadsheet",
+            "memory")
+        pr = vl.dataProvider()
+        vl.startEditing()
+        pr.addAttributes([QgsField(i, QVariant.String)
+                          for i in self.spreadsheetData[0]])
+        vl.commitChanges()
+        QgsMapLayerRegistry.instance().addMapLayer(vl)
+        return True
+
+    def createShapefile(self):
+        path = QFileDialog.getSaveFileName(
+            None,
+            'Save as Shapefile',
+            '',
+            'Select directory and set output filename')
+        if path:
+            print path
+            return True
+        return False
+
+    def createGeoJSON(self):
+        path = QFileDialog.getSaveFileName(
+            None,
+            'Save as GeoJSON',
+            '',
+            'Select directory and set output filename')
+        if path:
+            print path
+            return True
+        return False
+
     def accept(self):
         if self.run():
             super(SpreadsheetModule, self).accept()
@@ -107,16 +143,9 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
                 level=QgsMessageBar.WARNING)
             return False
         if self.memoryButton.isChecked():
-            if not QgsMapLayerRegistry.instance().mapLayersByName('Spreadsheet'):
-                vl = QgsVectorLayer(
-                    "Point?crs=" + self.epsgBox.crs().geographicCRSAuthId(),
-                    "Spreadsheet",
-                    "memory")
-                pr = vl.dataProvider()
-                vl.startEditing()
-                pr.addAttributes([QgsField(i, QVariant.String)
-                                  for i in self.spreadsheetData[0]])
-                vl.commitChanges()
-                QgsMapLayerRegistry.instance().addMapLayer(vl)
-            return True
+            return self.createMemoryLayer()
+        elif self.outputBox.currentText() == 'Shapefile':
+            return self.createShapefile()
+        elif self.outputBox.currentText() == 'GeoJSON':
+            return self.createGeoJSON()
         return False
