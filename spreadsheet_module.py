@@ -23,7 +23,9 @@
 from PyQt4 import uic
 from PyQt4.QtCore import QSettings, QVariant
 from PyQt4.QtGui import QFileDialog, QDialog, QDialogButtonBox
-from qgis.core import QgsMapLayerRegistry, QgsField, QgsVectorLayer
+from qgis.core import QgsMapLayerRegistry, QgsField, QgsFields, \
+        QgsVectorLayer, QgsFeature, QGis, QgsVectorFileWriter, QgsGeometry, \
+        QgsPoint
 from qgis.gui import QgsMessageBar, QgsProjectionSelectionWidget
 from pyexcel import get_sheet
 import re
@@ -59,8 +61,8 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
     def convert_coordinates(self, data, indexes):
         output = []
         for line in data:
-            line[indexes[0]] = degree_to_decimal(ine[indexes[0]])
-            line[indexes[1]] = degree_to_decimal(ine[indexes[1]])
+            line[indexes[0]] = self.degree_to_decimal(line[indexes[0]])
+            line[indexes[1]] = self.degree_to_decimal(line[indexes[1]])
             output.append(line)
         return output
 
@@ -116,7 +118,31 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
             '',
             'Select directory and set output filename')
         if path:
-            print path
+            fields = QgsFields()
+            for field in self.spreadsheetData[0]:
+                fields.append(QgsField(field, QVariant.String))
+            vl = QgsVectorFileWriter(path + '.shp', "utf-8",
+                                     fields,
+                                     QGis.WKBPoint,
+                                     self.epsgBox.crs(),
+                                     "ESRI Shapefile")
+            del vl
+            vl = self.iface.addVectorLayer(path + '.shp',
+                                           path.split('/')[-1],
+                                           "ogr")
+            pr = vl.dataProvider()
+            vl.startEditing()
+            for row in self.convert_coordinates(self.spreadsheetData[1:],
+                                                [self.xBox.currentIndex(),
+                                                 self.yBox.currentIndex()]):
+                feature = QgsFeature()
+                feature.setGeometry(QgsGeometry.fromPoint(
+                    QgsPoint(
+                        row[self.xBox.currentIndex()],
+                        row[self.yBox.currentIndex()])))
+                feature.setAttributes(row)
+                pr.addFeatures([feature])
+            vl.commitChanges()
             return True
         return False
 
