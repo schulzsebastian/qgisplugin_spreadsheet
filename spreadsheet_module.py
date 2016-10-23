@@ -107,6 +107,16 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
         vl.startEditing()
         pr.addAttributes([QgsField(i, QVariant.String)
                           for i in self.spreadsheetData[0]])
+        for row in self.convert_coordinates(self.spreadsheetData[1:],
+                                            [self.xBox.currentIndex(),
+                                             self.yBox.currentIndex()]):
+            feature = QgsFeature()
+            feature.setGeometry(QgsGeometry.fromPoint(
+                QgsPoint(
+                    row[self.xBox.currentIndex()],
+                    row[self.yBox.currentIndex()])))
+            feature.setAttributes(row)
+            pr.addFeatures([feature])
         vl.commitChanges()
         QgsMapLayerRegistry.instance().addMapLayer(vl)
         return True
@@ -121,7 +131,7 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
             fields = QgsFields()
             for field in self.spreadsheetData[0]:
                 fields.append(QgsField(field, QVariant.String))
-            vl = QgsVectorFileWriter(path + '.shp', "utf-8",
+            vl = QgsVectorFileWriter(path, "utf-8",
                                      fields,
                                      QGis.WKBPoint,
                                      self.epsgBox.crs(),
