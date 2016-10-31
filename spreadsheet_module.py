@@ -27,7 +27,9 @@ from qgis.core import QgsMapLayerRegistry, QgsField, QgsFields, \
         QgsVectorLayer, QgsFeature, QGis, QgsVectorFileWriter, QgsGeometry, \
         QgsPoint
 from qgis.gui import QgsMessageBar, QgsProjectionSelectionWidget
-from pyexcel import get_sheet
+from dependencies import *
+from xlrd import open_workbook, xldate_as_tuple, XL_CELL_DATE
+from datetime import datetime
 import re
 import os
 
@@ -50,7 +52,22 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
             QgsProjectionSelectionWidget.CurrentCrs, False)
 
     def read_spreadsheet(self, path):
-        return get_sheet(file_name=path).to_array()
+        data = []
+        wb = open_workbook(path)
+        sh = wb.sheet_by_index(0)
+        for row in range(sh.nrows):
+            line = []
+            for col in range(sh.ncols):
+                if sh.cell_type(row, col) == XL_CELL_DATE:
+                    dt_tuple = xldate_as_tuple(sh.cell(row, col).value, wb.datemode)
+                    date = datetime(dt_tuple[0], dt_tuple[1], dt_tuple[2])
+                    date = date.strftime('%d-%m-%Y')
+                    line.append(date)
+                    print date
+                else:
+                    line.append(sh.cell(row, col).value)
+            data.append(line)
+        return data
 
     def degree_to_decimal(self, coord):
         s = re.search("(\d+)[ENSW](\d+)\'(\d+)\"", coord)
