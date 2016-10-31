@@ -63,7 +63,6 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
                     date = datetime(dt_tuple[0], dt_tuple[1], dt_tuple[2])
                     date = date.strftime('%d-%m-%Y')
                     line.append(date)
-                    print date
                 else:
                     line.append(sh.cell(row, col).value)
             data.append(line)
