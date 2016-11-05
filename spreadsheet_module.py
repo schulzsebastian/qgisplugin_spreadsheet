@@ -121,11 +121,16 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
             "memory")
         pr = vl.dataProvider()
         vl.startEditing()
+        print self.spreadsheetData[0]
         pr.addAttributes([QgsField(i, QVariant.String)
                           for i in self.spreadsheetData[0]])
-        for row in self.convert_coordinates(self.spreadsheetData[1:],
-                                            [self.xBox.currentIndex(),
-                                             self.yBox.currentIndex()]):
+        if self.skipBox.isChecked():
+            self.spreadsheetData = self.spreadsheetData[1:]
+        if self.convertBox.isChecked():
+            self.spreadsheetData = self.convert_coordinates(
+                self.spreadsheetData,
+                [self.xBox.currentIndex(), self.yBox.currentIndex()])
+        for row in self.spreadsheetData:
             feature = QgsFeature()
             feature.setGeometry(QgsGeometry.fromPoint(
                 QgsPoint(
