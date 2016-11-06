@@ -76,6 +76,11 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
 
     def convert_coordinates(self, data, indexes):
         output = []
+        try:
+            self.degree_to_decimal(data[0][indexes[0]])
+            self.degree_to_decimal(data[0][indexes[1]])
+        except:
+            return output
         for line in data:
             line[indexes[0]] = self.degree_to_decimal(line[indexes[0]])
             line[indexes[1]] = self.degree_to_decimal(line[indexes[1]])
@@ -89,6 +94,12 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
             self.spreadsheetData = self.convert_coordinates(
                 self.spreadsheetData,
                 [self.xBox.currentIndex(), self.yBox.currentIndex()])
+        if not self.spreadsheetData:
+            self.iface.messageBar().pushMessage(
+                'Spreadsheet',
+                'Invalid headers',
+                level=QgsMessageBar.WARNING)
+            return False
         try:
             float(self.spreadsheetData[0][self.xBox.currentIndex()])
             float(self.spreadsheetData[0][self.yBox.currentIndex()])
@@ -206,14 +217,14 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
             super(SpreadsheetModule, self).accept()
 
     def run(self):
+        # update spreadsheet data (twice-used fix)
+        self.spreadsheetData = self.read_spreadsheet(self.fileLine.text())
         if len(self.spreadsheetData) < 2:
             self.iface.messageBar().pushMessage(
                 'Spreadsheet',
                 'No data except the header',
                 level=QgsMessageBar.WARNING)
             return False
-        # update spreadsheet data (twice-used fix)
-        self.spreadsheetData = self.read_spreadsheet(self.fileLine.text())
         if self.memoryButton.isChecked():
             return self.createMemoryLayer()
         elif self.outputBox.currentText() == 'Shapefile':
