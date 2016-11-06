@@ -82,6 +82,24 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
             output.append(line)
         return output
 
+    def validate_coordinates(self):
+        if self.skipBox.isChecked():
+            self.spreadsheetData = self.spreadsheetData[1:]
+        if self.convertBox.isChecked():
+            self.spreadsheetData = self.convert_coordinates(
+                self.spreadsheetData,
+                [self.xBox.currentIndex(), self.yBox.currentIndex()])
+        try:
+            float(self.spreadsheetData[0][self.xBox.currentIndex()])
+            float(self.spreadsheetData[0][self.yBox.currentIndex()])
+            return True
+        except:
+            self.iface.messageBar().pushMessage(
+                'Spreadsheet',
+                'Invalid coordinates',
+                level=QgsMessageBar.WARNING)
+            return False
+
     def updateCoordinates(self):
         self.spreadsheetData = self.read_spreadsheet(self.fileLine.text())
         self.xBox.clear()
@@ -121,26 +139,21 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
             "memory")
         pr = vl.dataProvider()
         vl.startEditing()
-        print self.spreadsheetData[0]
         pr.addAttributes([QgsField(i, QVariant.String)
                           for i in self.spreadsheetData[0]])
-        if self.skipBox.isChecked():
-            self.spreadsheetData = self.spreadsheetData[1:]
-        if self.convertBox.isChecked():
-            self.spreadsheetData = self.convert_coordinates(
-                self.spreadsheetData,
-                [self.xBox.currentIndex(), self.yBox.currentIndex()])
-        for row in self.spreadsheetData:
-            feature = QgsFeature()
-            feature.setGeometry(QgsGeometry.fromPoint(
-                QgsPoint(
-                    row[self.xBox.currentIndex()],
-                    row[self.yBox.currentIndex()])))
-            feature.setAttributes(row)
-            pr.addFeatures([feature])
-        vl.commitChanges()
-        QgsMapLayerRegistry.instance().addMapLayer(vl)
-        return True
+        if self.validate_coordinates():
+            for row in self.spreadsheetData:
+                feature = QgsFeature()
+                feature.setGeometry(QgsGeometry.fromPoint(
+                    QgsPoint(
+                        row[self.xBox.currentIndex()],
+                        row[self.yBox.currentIndex()])))
+                feature.setAttributes(row)
+                pr.addFeatures([feature])
+            vl.commitChanges()
+            QgsMapLayerRegistry.instance().addMapLayer(vl)
+            return True
+        return False
 
     def createShapefile(self):
         path = QFileDialog.getSaveFileName(
@@ -199,6 +212,8 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
                 'No data except the header',
                 level=QgsMessageBar.WARNING)
             return False
+        # update spreadsheet data (twice-used fix)
+        self.spreadsheetData = self.read_spreadsheet(self.fileLine.text())
         if self.memoryButton.isChecked():
             return self.createMemoryLayer()
         elif self.outputBox.currentText() == 'Shapefile':
