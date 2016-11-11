@@ -44,6 +44,7 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
         self.setupUi(self)
         self.parent = parent
         self.iface = parent.iface
+        self.regexLine.setText("(\d+)[ENSW](\d+)\'(\d+)\"")
         self.fileButton.clicked.connect(self.selectFile)
         self.memoryButton.clicked.connect(self.outputOff)
         self.fileSaveButton.clicked.connect(self.outputOn)
@@ -59,7 +60,8 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
             line = []
             for col in range(sh.ncols):
                 if sh.cell_type(row, col) == XL_CELL_DATE:
-                    dt_tuple = xldate_as_tuple(sh.cell(row, col).value, wb.datemode)
+                    dt_tuple = xldate_as_tuple(
+                        sh.cell(row, col).value, wb.datemode)
                     date = datetime(dt_tuple[0], dt_tuple[1], dt_tuple[2])
                     date = date.strftime('%d-%m-%Y')
                     line.append(date)
@@ -69,10 +71,13 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
         return data
 
     def degree_to_decimal(self, coord):
-        s = re.search("(\d+)[ENSW](\d+)\'(\d+)\"", coord)
+        s = re.search(self.regexLine.text(), coord)
+        sign = 1
+        if [char for char in ['s', 'w'] if char in coord.lower()]:
+            sign = -1
         return round(int(s.group(1)) +
                      (float(s.group(2)) / 60) +
-                     (float(s.group(3)) / 3600), 10)
+                     (float(s.group(3)) / 3600), 10) * sign
 
     def convert_coordinates(self, data, indexes):
         output = []
