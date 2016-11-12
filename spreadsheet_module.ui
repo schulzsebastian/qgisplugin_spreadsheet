@@ -93,7 +93,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="label_4">
+    <widget class="QLabel" name="regexLabel">
      <property name="text">
       <string>Regex pattern (degrees, minutes and seconds):</string>
      </property>
@@ -124,7 +124,10 @@
     </layout>
    </item>
    <item>
-    <widget class="QLabel" name="label_5">
+    <widget class="QLabel" name="outputLabel">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="text">
       <string>Output file type:</string>
      </property>

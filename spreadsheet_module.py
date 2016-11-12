@@ -46,11 +46,30 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
         self.iface = parent.iface
         self.regexLine.setText("(\d+)[ENSW](\d+)\'(\d+)\"")
         self.fileButton.clicked.connect(self.selectFile)
-        self.memoryButton.clicked.connect(self.outputOff)
-        self.fileSaveButton.clicked.connect(self.outputOn)
+        self.memoryButton.clicked.connect(self.toggleOutput)
+        self.fileSaveButton.clicked.connect(self.toggleOutput)
+        self.convertBox.clicked.connect(self.toggleConvert)
         self.executeBox.button(QDialogButtonBox.Ok).setEnabled(False)
         self.epsgBox.setOptionVisible(
             QgsProjectionSelectionWidget.CurrentCrs, False)
+
+    def toggleConvert(self):
+        if self.convertBox.isChecked():
+            self.regexLine.setEnabled(True)
+            self.regexLabel.setEnabled(True)
+        else:
+            self.regexLine.setEnabled(False)
+            self.regexLabel.setEnabled(False)
+
+    def toggleOutput(self):
+        if self.fileSaveButton.isChecked():
+            self.outputLabel.setEnabled(True)
+            self.outputBox.setEnabled(True)
+            self.outputBox.addItems(['Shapefile', 'GeoJSON'])
+        else:
+            self.outputLabel.setEnabled(False)
+            self.outputBox.setEnabled(False)
+            self.outputBox.clear()
 
     def read_spreadsheet(self, path):
         data = []
@@ -139,14 +158,6 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
         self.fileLine.setText(filename)
         if filename:
             self.updateCoordinates()
-
-    def outputOn(self):
-        self.outputBox.setEnabled(True)
-        self.outputBox.addItems(['Shapefile', 'GeoJSON'])
-
-    def outputOff(self):
-        self.outputBox.setEnabled(False)
-        self.outputBox.clear()
 
     def createMemoryLayer(self):
         vl = QgsVectorLayer(
