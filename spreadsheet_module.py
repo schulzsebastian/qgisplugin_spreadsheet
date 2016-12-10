@@ -159,7 +159,7 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
         if filename:
             self.updateCoordinates()
 
-    def createMemoryLayer(self):
+    def createLayer(self, save=None):
         vl = QgsVectorLayer(
             "Point?crs=" + self.epsgBox.crs().geographicCRSAuthId(),
             "Spreadsheet",
@@ -178,54 +178,45 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
                 feature.setAttributes(row)
                 pr.addFeatures([feature])
             vl.commitChanges()
-            QgsMapLayerRegistry.instance().addMapLayer(vl)
-            return True
-        return False
-
-    def createShapefile(self):
-        path = QFileDialog.getSaveFileName(
-            None,
-            'Save as Shapefile',
-            '',
-            'Select directory and set output filename')
-        if path:
-            fields = QgsFields()
-            for field in self.spreadsheetData[0]:
-                fields.append(QgsField(field, QVariant.String))
-            vl = QgsVectorFileWriter(path, "utf-8",
-                                     fields,
-                                     QGis.WKBPoint,
-                                     self.epsgBox.crs(),
-                                     "ESRI Shapefile")
-            del vl
-            vl = self.iface.addVectorLayer(path + '.shp',
-                                           path.split('/')[-1],
-                                           "ogr")
-            pr = vl.dataProvider()
-            vl.startEditing()
-            for row in self.convert_coordinates(self.spreadsheetData[1:],
-                                                [self.xBox.currentIndex(),
-                                                 self.yBox.currentIndex()]):
-                feature = QgsFeature()
-                feature.setGeometry(QgsGeometry.fromPoint(
-                    QgsPoint(
-                        row[self.xBox.currentIndex()],
-                        row[self.yBox.currentIndex()])))
-                feature.setAttributes(row)
-                pr.addFeatures([feature])
-            vl.commitChanges()
-            return True
-        return False
-
-    def createGeoJSON(self):
-        path = QFileDialog.getSaveFileName(
-            None,
-            'Save as GeoJSON',
-            '',
-            'Select directory and set output filename')
-        if path:
-            print path
-            return True
+            if not save:
+                QgsMapLayerRegistry.instance().addMapLayer(vl)
+                return True
+            elif save == 'GeoJSON':
+                path = QFileDialog.getSaveFileName(
+                    None,
+                    'Save as GeoJSON',
+                    '',
+                    'Select directory and set output filename')
+                if path:
+                    QgsVectorFileWriter.writeAsVectorFormat(
+                        vl,
+                        path + '.geojson',
+                        'utf-8',
+                        vl.crs(),
+                        'GeoJSON',
+                        layerOptions=['COORDINATE_PRECISION=15'])
+                    self.iface.addVectorLayer(path + '.geojson',
+                                              os.path.basename(path),
+                                              'ogr')
+                    QgsMapLayerRegistry.instance().addMapLayer(vl)
+                    return True
+            elif save == 'Shapefile':
+                path = QFileDialog.getSaveFileName(
+                    None,
+                    'Save as Shapefile',
+                    '',
+                    'Select directory and set output filename')
+                if path:
+                    QgsVectorFileWriter.writeAsVectorFormat(
+                        vl,
+                        path + '.shp',
+                        'utf-8',
+                        vl.crs(),
+                        'ESRI Shapefile')
+                    self.iface.addVectorLayer(path + '.shp',
+                                              os.path.basename(path),
+                                              'ogr')
+                    return True
         return False
 
     def accept(self):
@@ -242,9 +233,6 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
                 level=QgsMessageBar.WARNING)
             return False
         if self.memoryButton.isChecked():
-            return self.createMemoryLayer()
-        elif self.outputBox.currentText() == 'Shapefile':
-            return self.createShapefile()
-        elif self.outputBox.currentText() == 'GeoJSON':
-            return self.createGeoJSON()
-        return False
+            return self.createLayer()
+        else:
+            return self.createLayer(save=self.outputBox.currentText())
