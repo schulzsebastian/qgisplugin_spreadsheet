@@ -30,6 +30,7 @@ from qgis.gui import QgsMessageBar, QgsProjectionSelectionWidget
 from dependencies import *
 from xlrd import open_workbook, xldate_as_tuple, XL_CELL_DATE
 from datetime import datetime
+import locale
 import re
 import os
 
@@ -188,16 +189,18 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
                     '',
                     'Select directory and set output filename')
                 if path:
+                    loc = locale.getlocale()
+                    locale.setlocale(locale.LC_NUMERIC, 'C')
                     QgsVectorFileWriter.writeAsVectorFormat(
                         vl,
                         path + '.geojson',
                         'utf-8',
                         vl.crs(),
-                        'GeoJSON',
-                        layerOptions=['COORDINATE_PRECISION=15'])
+                        'GeoJSON')
                     self.iface.addVectorLayer(path + '.geojson',
                                               os.path.basename(path),
                                               'ogr')
+                    locale.setlocale(locale.LC_NUMERIC, loc)
                     QgsMapLayerRegistry.instance().addMapLayer(vl)
                     return True
             elif save == 'Shapefile':
