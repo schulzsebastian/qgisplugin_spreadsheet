@@ -30,7 +30,6 @@ from qgis.gui import QgsMessageBar, QgsProjectionSelectionWidget
 from dependencies import *
 from xlrd import open_workbook, xldate_as_tuple, XL_CELL_DATE
 from datetime import datetime
-import locale
 import re
 import os
 
@@ -66,7 +65,7 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
         if self.fileSaveButton.isChecked():
             self.outputLabel.setEnabled(True)
             self.outputBox.setEnabled(True)
-            self.outputBox.addItems(['Shapefile', 'GeoJSON'])
+            self.outputBox.addItems(['Shapefile'])
         else:
             self.outputLabel.setEnabled(False)
             self.outputBox.setEnabled(False)
@@ -182,27 +181,6 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
             if not save:
                 QgsMapLayerRegistry.instance().addMapLayer(vl)
                 return True
-            elif save == 'GeoJSON':
-                path = QFileDialog.getSaveFileName(
-                    None,
-                    'Save as GeoJSON',
-                    '',
-                    'Select directory and set output filename')
-                if path:
-                    loc = locale.getlocale()
-                    locale.setlocale(locale.LC_NUMERIC, 'C')
-                    QgsVectorFileWriter.writeAsVectorFormat(
-                        vl,
-                        path + '.geojson',
-                        'utf-8',
-                        vl.crs(),
-                        'GeoJSON')
-                    self.iface.addVectorLayer(path + '.geojson',
-                                              os.path.basename(path),
-                                              'ogr')
-                    locale.setlocale(locale.LC_NUMERIC, loc)
-                    QgsMapLayerRegistry.instance().addMapLayer(vl)
-                    return True
             elif save == 'Shapefile':
                 path = QFileDialog.getSaveFileName(
                     None,
