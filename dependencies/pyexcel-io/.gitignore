@@ -1,0 +1,7 @@
+*.pyc
+*~
+.coverage
+pyexcel*-info
+build
+dist
+tmp.db
