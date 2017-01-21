@@ -29,7 +29,9 @@ from qgis.core import QgsMapLayerRegistry, QgsField, QgsFields, \
 from qgis.gui import QgsMessageBar, QgsProjectionSelectionWidget
 from dependencies import *
 from xlrd import open_workbook, xldate_as_tuple, XL_CELL_DATE
+from pyexcel_ods import get_data
 from datetime import datetime
+import json
 import re
 import os
 
@@ -73,20 +75,28 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
 
     def read_spreadsheet(self, path):
         data = []
-        wb = open_workbook(path)
-        sh = wb.sheet_by_index(0)
-        for row in range(sh.nrows):
-            line = []
-            for col in range(sh.ncols):
-                if sh.cell_type(row, col) == XL_CELL_DATE:
-                    dt_tuple = xldate_as_tuple(
-                        sh.cell(row, col).value, wb.datemode)
-                    date = datetime(dt_tuple[0], dt_tuple[1], dt_tuple[2])
-                    date = date.strftime('%d-%m-%Y')
-                    line.append(date)
-                else:
-                    line.append(sh.cell(row, col).value)
-            data.append(line)
+        if path.split('.')[-1] == 'ods':
+            wb = get_data(path)
+            sh = wb[wb.keys()[0]]
+            for row in sh:
+                fixed_line = [i.strftime('%d-%m-%Y') if isinstance(i, datetime)
+                              else i for i in row]
+                data.append(fixed_line)
+        elif path.split('.')[-1] in ['xlsx', 'xls']:
+            wb = open_workbook(path)
+            sh = wb.sheet_by_index(0)
+            for row in range(sh.nrows):
+                line = []
+                for col in range(sh.ncols):
+                    if sh.cell_type(row, col) == XL_CELL_DATE:
+                        dt_tuple = xldate_as_tuple(
+                            sh.cell(row, col).value, wb.datemode)
+                        date = datetime(dt_tuple[0], dt_tuple[1], dt_tuple[2])
+                        date = date.strftime('%d-%m-%Y')
+                        line.append(date)
+                    else:
+                        line.append(sh.cell(row, col).value)
+                data.append(line)
         return data
 
     def degree_to_decimal(self, coord):
