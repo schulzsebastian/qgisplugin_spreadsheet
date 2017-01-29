@@ -10,13 +10,13 @@
 name=Spreadsheet
 qgisMinimumVersion=2.0
 description=Plugin for loading spreadsheet data
-version=0.1
+version=0.2
 author=Sebastian Schulz
 email=schulz.siwy@gmail.com
 
-about=Engineering thesis: Create spreadsheet support for QGIS
+about=Load spatial data from spreadsheets
 
-tracker=htt
+tracker=https://github.com/schulzsebastian/qgisplugin_spreadsheet/issues
 repository=https://github.com/schulzsebastian/qgisplugin_spreadsheet
 # End of mandatory metadata
 
@@ -32,7 +32,7 @@ homepage=https://github.com/schulzsebastian/qgisplugin_spreadsheet
 category=Plugins
 icon=icon.png
 # experimental flag
-experimental=True
+experimental=False
 
 # deprecated flag (applies to the whole plugin, not just a single version)
 deprecated=False
