@@ -154,10 +154,7 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
             self.yBox.addItems(self.spreadsheetData[0])
             self.executeBox.button(QDialogButtonBox.Ok).setEnabled(True)
         except IndexError:
-            self.iface.messageBar().pushMessage(
-                'Spreadsheet',
-                'Empty file',
-                level=QgsMessageBar.WARNING)
+            pass
 
     def selectFile(self):
         filename = QFileDialog.getOpenFileName(
@@ -220,7 +217,7 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
         if len(self.spreadsheetData) < 2:
             self.iface.messageBar().pushMessage(
                 'Spreadsheet',
-                'No data except the header',
+                'Empty file',
                 level=QgsMessageBar.WARNING)
             return False
         if self.memoryButton.isChecked():
