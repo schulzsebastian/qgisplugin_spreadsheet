@@ -30,7 +30,7 @@ from qgis.gui import QgsMessageBar, QgsProjectionSelectionWidget
 from dependencies import *
 from xlrd import open_workbook, xldate_as_tuple, XL_CELL_DATE
 from pyexcel_ods import get_data
-from datetime import datetime
+from datetime import datetime, date as dt
 import json
 import re
 import os
@@ -79,7 +79,7 @@ class SpreadsheetModule(QDialog, FORM_CLASS):
             wb = get_data(path)
             sh = wb[wb.keys()[0]]
             for row in sh:
-                fixed_line = [i.strftime('%d-%m-%Y') if isinstance(i, datetime)
+                fixed_line = [i.strftime('%d-%m-%Y') if isinstance(i, dt)
                               else i for i in row]
                 data.append(fixed_line)
         elif path.split('.')[-1] in ['xlsx', 'xls']:
